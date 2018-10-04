@@ -28,8 +28,11 @@
   "extra": {
     "laravel": {
       "providers": [
-
-      ]
+        "OpenID\\Client\\ClientServiceProvider"
+      ],
+      "aliases": {
+        "OpenID": "OpenID\\Client\\Facades\\OpenidFacade"
+      }
     }
   },
   "config": {

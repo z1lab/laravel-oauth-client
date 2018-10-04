@@ -22,11 +22,17 @@ class ClientServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->deleteCookieOnLogout();
+
+        $this->app->singleton('openid', function ($app) {
+            return new Client();
+        });
     }
 
     public function register()
     {
-        //
+        $this->registerGuards();
+
+        $this->registerConfig();
     }
 
     /**
@@ -37,8 +43,12 @@ class ClientServiceProvider extends ServiceProvider
     protected function deleteCookieOnLogout()
     {
         Event::listen(Logout::class, function () {
-            if (Request::hasCookie(Client::cookie())) {
-                Cookie::queue(Cookie::forget(Client::cookie()));
+            if (Request::hasCookie(Client::$access_cookie)) {
+                Cookie::queue(Cookie::forget(Client::$access_cookie));
+            }
+
+            if (Request::hasCookie(Client::$openid_cookie)) {
+                Cookie::queue(Cookie::forget(Client::$openid_cookie));
             }
         });
     }
@@ -72,5 +82,12 @@ class ClientServiceProvider extends ServiceProvider
         return new RequestGuard(function ($request) use ($config) {
             return (new TokenGuard())->user($request);
         }, $this->app['request']);
+    }
+
+    protected function registerConfig()
+    {
+        $this->publishes([
+            __DIR__ . '/../config/openid.php' => config_path('openid.php')
+        ], 'openid-config');
     }
 }

@@ -2,152 +2,77 @@
 
 namespace OpenID\Client\Guards;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Support\Facades\Config;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Signer\Rsa\Sha256;
-use Lcobucci\JWT\Token;
-use Lcobucci\JWT\ValidationData;
-use OpenID\Client\Client;
-use OpenID\Client\User;
+use OpenID\Client\Traits\CreateUserTrait;
+use OpenID\Client\Traits\ValidateTokenTrait;
 
 class TokenGuard
 {
+    use ValidateTokenTrait, CreateUserTrait;
+
     /**
-     * Get the user for the incoming request.
+     * Get the currently authenticated user.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @param Request $request
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function user(Request $request)
     {
-        if ($request->bearerToken()) {
-            return $this->authenticateViaBearerToken($request);
+        if (!is_null($this->user)) {
+            if ($this->user->expires_at < Carbon::now()) {
+                return $this->user = null;
+            }
+
+            return $this->user;
         }
 
-        return null;
+        $token = $this->getTokenForRequest($request);
+
+        if (empty($token)) {
+            return null;
+        }
+
+        $access_token = $this->validateToken($token);
+        if (!$access_token) {
+            return null;
+        }
+
+        $token = $this->geIdTokenForRequest($request);
+
+        if (empty($token)) {
+            return null;
+        }
+
+        $id_token = $this->validateToken($token);
+
+        if (!$id_token || $id_token->getClaim('sub') !== $access_token->getClaim('sub')) {
+            return null;
+        }
+
+        return $this->user = $this->createUserFromToken($id_token);
     }
 
     /**
-     * Authenticate the incoming request via the Bearer token.
+     * Get the token for the current request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return null|\OpenID\Client\User
-     */
-    protected function authenticateViaBearerToken($request)
-    {
-       try {
-            $access_token = $this->validateAuthenticatedRequest($request);
-
-            if (!$access_token) {
-                return null;
-            }
-
-            try {
-                if ($request->hasCookie(Client::cookie())) {
-                    $token = (new Parser())->parse($request->cookie(Client::cookie()));
-
-                    $this->validateToken($token, 'OpenID');
-
-                    if ($access_token->getClaim('sub') !== $token->getClaim('sub')) {
-                        throw new \Exception('OpenID token is invalid', 401);
-                    }
-                }
-            } catch (\InvalidArgumentException $exception) {
-                throw new \Exception($exception->getMessage(), 401);
-            } catch (\RuntimeException $exception) {
-                throw  new \Exception('Error while decoding to JSON', 401);
-            }
-
-            $user = $this->getUserByToken($token ?? $access_token);
-
-            if (! $user) {
-                return null;
-            }
-
-            $user->access_token = (string) $access_token;
-
-            return $user;
-        } catch (\Exception $e) {
-            $request->headers->set( 'Authorization', '', true );
-
-            Container::getInstance()->make(
-                ExceptionHandler::class
-            )->report($e);
-        }
-
-        return null;
-    }
-
-    /**
      * @param Request $request
-     * @return Token
-     * @throws \Exception
+     * @return string
      */
-    private function validateAuthenticatedRequest(Request $request)
+    public function getTokenForRequest(Request $request)
     {
-        if (!$request->headers->has('authorization')) {
-            throw new \Exception('Missing "Authorization" header', 401);
-        }
-
-        $header = $request->headers->get('authorization');
-        $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $header[0]));
-
-        try {
-            $token = (new Parser())->parse($jwt);
-
-            $this->validateToken($token, 'Access');
-
-            if (!in_array(Config::get('openid-client.client.id'), explode(' ', $token->getClaim('aud')))) {
-                throw new \Exception('Access token is invalid', 401);
-            }
-
-            return $token;
-        } catch (\InvalidArgumentException $exception) {
-            throw new \Exception($exception->getMessage(), 401);
-        } catch (\RuntimeException $exception) {
-            throw  new \Exception('Error while decoding to JSON', 401);
-        }
+        return $request->bearerToken();
     }
 
-    /**
-     * @param Token $token
-     * @param string $name
-     * @throws \Exception
-     */
-    private function validateToken(Token $token, string $name)
-    {
-        try {
-            if (!$token->verify(new Sha256(), 'file://' . Config::get('openid-client.key'))) {
-                throw new \Exception("$name token could not be verified", 401);
-            }
-        } catch (\BadMethodCallException $exception) {
-            throw new \Exception("$name token is not signed", 401);
-        }
-
-        $data = new ValidationData();
-        $data->setCurrentTime(time());
-
-        if (!$token->validate($data)) {
-            throw new \Exception("$name token is invalid", 401);
-        }
-
-    }
 
     /**
-     * @param Token $token
-     * @return User
+     * Get the id_token for the current request.
+     *
+     * @param Request $request
+     * @return string
      */
-    private function getUserByToken(Token $token)
+    public function geIdTokenForRequest(Request $request)
     {
-        $user = new User(['id' => $token->getClaim('sub'), 'expires_at' => $token->getClaim('exp')]);
-        $special_claims = array_except(array_keys($token->getClaims()), ['sub', 'aud', 'jti', 'iat', 'iss', 'nbf']);
-        foreach ($special_claims as $claim) {
-            $user->$claim = $token->getClaim($claim);
-        }
-
-        return $user;
+        return $request->header('Id_Token', '');
     }
 }

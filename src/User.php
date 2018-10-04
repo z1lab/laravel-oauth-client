@@ -2,15 +2,14 @@
 
 namespace OpenID\Client;
 
-use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use OpenID\Client\Traits\MagicMethodsTrait;
+use OpenID\Client\Traits\UserTrait;
 
-class User implements UserContract
+class User implements UserContract, MustVerifyEmail
 {
-    /**
-     * @var
-     */
-    protected $attributes;
+    use UserTrait, MagicMethodsTrait;
 
     /**
      * User constructor.
@@ -19,114 +18,35 @@ class User implements UserContract
     public function __construct($attributes)
     {
         $this->attributes = $attributes;
-        if (isset($attributes['expires_at'])) {
-            $this->attributes['expires_at'] = Carbon::createFromTimestamp($attributes['expires_at']);
-        }
     }
 
     /**
-     * Get the name of the unique identifier for the user.
+     * Determine if the user has verified their email address.
      *
-     * @return string
-     */
-    public function getAuthIdentifierName()
-    {
-        return 'id';
-    }
-
-    /**
-     * Get the unique identifier for the user.
-     *
-     * @return mixed
-     */
-    public function getAuthIdentifier()
-    {
-        return $this->attributes[$this->getAuthIdentifierName()];
-    }
-
-    /**
-     * Get the password for the user.
-     *
-     * @return string
-     */
-    public function getAuthPassword()
-    {
-        return '';
-    }
-
-    /**
-     * Get the token value for the "remember me" session.
-     *
-     * @return string
-     */
-    public function getRememberToken()
-    {
-        return '';
-    }
-
-    /**
-     * Set the token value for the "remember me" session.
-     *
-     * @param  string $value
-     * @return void
-     */
-    public function setRememberToken($value)
-    {
-        return;
-    }
-
-    /**
-     * Get the column name for the "remember me" token.
-     *
-     * @return string
-     */
-    public function getRememberTokenName()
-    {
-        return '';
-    }
-
-    /**
-     * Dynamically access the user's attributes.
-     *
-     * @param  string  $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        return $this->attributes[$key];
-    }
-
-    /**
-     * Dynamically set an attribute on the user.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function __set($key, $value)
-    {
-        $this->attributes[$key] = $value;
-    }
-
-    /**
-     * Dynamically check if a value is set on the user.
-     *
-     * @param  string  $key
      * @return bool
      */
-    public function __isset($key)
+    public function hasVerifiedEmail()
     {
-        return isset($this->attributes[$key]);
+        return $this->attributes['email_verified'];
     }
 
     /**
-     * Dynamically unset a value on the user.
+     * Mark the given user's email as verified.
      *
-     * @param  string  $key
+     * @return bool
+     */
+    public function markEmailAsVerified()
+    {
+        return false;
+    }
+
+    /**
+     * Send the email verification notification.
+     *
      * @return void
      */
-    public function __unset($key)
+    public function sendEmailVerificationNotification()
     {
-        unset($this->attributes[$key]);
+        return;
     }
 }
