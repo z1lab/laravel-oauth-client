@@ -4,6 +4,7 @@ namespace OpenID\Client\Traits;
 
 use Carbon\Carbon;
 use Lcobucci\JWT\Token;
+use OpenID\Client\Address;
 use OpenID\Client\User;
 
 trait CreateUserTrait
@@ -39,6 +40,9 @@ trait CreateUserTrait
         $attributes['phone'] = $token->getClaim('phone_number');
         $attributes['phone_verified'] = $token->getClaim('phone_number_verified');
         $attributes['address'] = $token->getClaim('address');
+        if (filled($attributes['address'])) {
+            $attributes['address'] = new Address(json_decode($attributes['address'], true));
+        }
         $attributes['updated_at'] = Carbon::createFromTimestamp($token->getClaim('updated_at'));
 
         return new User($attributes);
