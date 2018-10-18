@@ -5,6 +5,9 @@ namespace OpenID\Client;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
+use http\Env\Request;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +24,7 @@ class Client
     /**
      * @var string
      */
-    public static $openid_cookie = 'identification_token';
+    public static $openid_cookie = 'id_token';
 
     /**
      * @var string
@@ -46,47 +49,15 @@ class Client
     }
 
     /**
-     * @param array $scopes
-     * @return bool
-     */
-    public function refreshToken(array $scopes = []) : bool
-    {
-        $refresh_token = Cookie::get(self::$refresh_cookie, '');
-        if (empty($refresh_token)) {
-            return false;
-        }
-
-        $scopes = array_prepend($scopes, 'openid');
-        $client = new \GuzzleHttp\Client(['base_uri' => config('openid.server')]);
-        try {
-            $respone = $client->post('/oauth/token', [
-                'form_params' => [
-                    'grant_type' => 'refresh_token',
-                    'refresh_token' => $refresh_token,
-                    'client_id' => config('openid.client.id'),
-                    'client_secret' => config('openid.client.secret'),
-                    'scope'         => implode(' ', $scopes),
-                ]
-            ]);
-            $result = json_decode($respone->getBody());
-            $expires = Carbon::now()->addSeconds($result->expires_in);
-            Cookie::queue(Cookie::make(self::$access_cookie, $result->access_token, $expires->diffInMinutes()));
-            Cookie::queue(Cookie::make(self::$openid_cookie, $result->id_token, $expires->diffInMinutes()));
-            Cookie::queue(Cookie::make(self::$refresh_cookie, $result->refresh_token, $expires->diffInMinutes()));
-
-            return true;
-        } catch (\Exception $exception) {
-            return false;
-        }
-    }
-
-    /**
      * @return void
      */
     public function routes()
     {
         Route::get('openid/callback', 'OpenID\Client\Http\Controllers\CallbackController@callback')
-            ->name('openid.callback');
+            ->middleware(EncryptCookies::class)->name('openid.callback');
+
+        Route::post('openid/refresh', 'OpenID\Client\Http\Controllers\RefreshController@refreshToken')
+            ->middleware(EncryptCookies::class)->name('openid.refresh');
 
         Route::post('logout', 'OpenID\Client\Http\Controllers\LogoutController@logout')->name('logout');
     }

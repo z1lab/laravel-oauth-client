@@ -66,12 +66,12 @@ class CallbackController
             throw new HttpException($exception->getCode() >= 400 && $exception->getCode() < 600? $exception->getCode() : 400,
                 $exception->getMessage());
         }
+
+        $minutes = Carbon::createFromTimestamp($token->getClaim('exp'))->diffInMinutes();
+
         return Redirect::intended()
-            ->withCookie(Cookie::make(\OpenID\Client\Client::$access_cookie, $response->access_token,
-                Carbon::createFromTimestamp($token->getClaim('exp'))->diffInMinutes()))
-            ->withCookie(Cookie::make(\OpenID\Client\Client::$openid_cookie, $response->id_token,
-                Carbon::createFromTimestamp($token->getClaim(('exp'))->diffInMinutes())))
-            ->withCookie(Cookie::make(\OpenID\Client\Client::$refresh_cookie, $response->refresh_token,
-                Carbon::createFromTimestamp($token->getClaim(('exp'))->diffInMinutes())));
+            ->withCookie(Cookie::make(\OpenID\Client\Client::$access_cookie, $response->access_token, $minutes))
+            ->withCookie(Cookie::make(\OpenID\Client\Client::$openid_cookie, $response->id_token, $minutes))
+            ->withCookie(Cookie::make(\OpenID\Client\Client::$refresh_cookie, $response->refresh_token, $minutes));
     }
 }
