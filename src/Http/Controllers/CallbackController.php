@@ -18,12 +18,14 @@ class CallbackController
     public function callback(Request $request)
     {
         if ($request->has('error')) {
-            switch ($request->get('error')) {
+            switch ($request->query('error')) {
                 case 'access_denied':
-                    throw new HttpException(401);
+                    throw new HttpException(401,
+                        $request->has('message') ? $request->query('message') : null);
                     break;
                 case 'temporarily_unavailable':
-                    throw new HttpException(503);
+                    throw new HttpException(503,
+                        $request->has('message') ? $request->query('message') : null);
                     break;
                 case 'invalid_request':
                 case 'unauthorized_client':
@@ -31,7 +33,8 @@ class CallbackController
                 case 'invalid_scope':
                 case 'server_error':
                 default:
-                    throw new HttpException($request->server->get('REDIRECT_STATUS', 500));
+                    throw new HttpException($request->server->get('REDIRECT_STATUS', 500),
+                        $request->has('message') ? $request->query('message') : null);
                     break;
             }
         }
@@ -54,19 +57,21 @@ class CallbackController
                 throw new HttpException($status, $response['error']);
             }
             $token = (new Parser())->parse($response->access_token);
-            Cookie::queue(Cookie::make(\OpenID\Client\Client::$access_cookie, $response->access_token,
-                Carbon::createFromTimestamp($token->hasClaim('exp'))->diffInMinutes()));
-            Cookie::queue(Cookie::make(\OpenID\Client\Client::$openid_cookie, $response->id_token,
-                Carbon::createFromTimestamp($token->hasClaim('exp'))->diffInMinutes()));
-            Cookie::queue(Cookie::make(\OpenID\Client\Client::$refresh_cookie, $response->refresh_token,
-                Carbon::createFromTimestamp($token->hasClaim('exp'))->diffInMinutes()));
         } catch (\Exception $exception) {
             if ($exception instanceof ServerException || $exception instanceof ClientException) {
-                throw new HttpException($exception->getResponse()->getStatusCode(), $exception->getMessage());
+                $result = json_decode($exception->getResponse()->getBody());
+                $message = isset($result->message) ? $result->message : $exception->getMessage();
+                throw new HttpException($exception->getResponse()->getStatusCode(), $message);
             }
             throw new HttpException($exception->getCode() >= 400 && $exception->getCode() < 600? $exception->getCode() : 400,
                 $exception->getMessage());
         }
-        return Redirect::intended();
+        return Redirect::intended()
+            ->withCookie(Cookie::make(\OpenID\Client\Client::$access_cookie, $response->access_token,
+                Carbon::createFromTimestamp($token->getClaim('exp'))->diffInMinutes()))
+            ->withCookie(Cookie::make(\OpenID\Client\Client::$openid_cookie, $response->id_token,
+                Carbon::createFromTimestamp($token->getClaim(('exp'))->diffInMinutes())))
+            ->withCookie(Cookie::make(\OpenID\Client\Client::$refresh_cookie, $response->refresh_token,
+                Carbon::createFromTimestamp($token->getClaim(('exp'))->diffInMinutes())));
     }
 }

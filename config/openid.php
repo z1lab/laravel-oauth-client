@@ -5,6 +5,6 @@ return [
     'server' => env('AUTH_SERVER'),
     'client' => [
         'id' => env('CLIENT_ID'),
-        'SECRET' => env('CLIENT_SECRET')
+        'secret' => env('CLIENT_SECRET')
     ]
 ];

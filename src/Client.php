@@ -32,7 +32,7 @@ class Client
      * @param array $scopes
      * @return RedirectResponse
      */
-    private function askForToken(array $scopes = [])
+    public function askForToken(array $scopes = [])
     {
         $scopes = array_prepend($scopes, 'openid');
 
@@ -42,14 +42,14 @@ class Client
             'response_type' => 'code',
             'scope'         => implode(' ', $scopes),
         ]);
-        return new RedirectResponse(config('openid.server') . "/oauth/authorize?$query");
+        return new RedirectResponse(str_finish(config('openid.server'), '/') . "oauth/authorize?$query");
     }
 
     /**
      * @param array $scopes
      * @return bool
      */
-    private function refreshToken(array $scopes = []) : bool
+    public function refreshToken(array $scopes = []) : bool
     {
         $refresh_token = Cookie::get(self::$refresh_cookie, '');
         if (empty($refresh_token)) {
@@ -83,7 +83,7 @@ class Client
     /**
      * @return void
      */
-    private function routes()
+    public function routes()
     {
         Route::get('openid/callback', 'OpenID\Client\Http\Controllers\CallbackController@callback')
             ->name('openid.callback');
