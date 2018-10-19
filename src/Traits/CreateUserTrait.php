@@ -44,6 +44,7 @@ trait CreateUserTrait
             $attributes['address'] = new Address(json_decode($attributes['address'], true));
         }
         $attributes['updated_at'] = Carbon::createFromTimestamp($token->getClaim('updated_at'));
+        $attributes['roles'] = explode(' ', $token->getClaim('roles'));
 
         return new User($attributes);
     }

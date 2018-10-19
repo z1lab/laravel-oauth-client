@@ -11,6 +11,8 @@ class TokenGuard
 {
     use ValidateTokenTrait, CreateUserTrait;
 
+    protected $user;
+
     /**
      * Get the currently authenticated user.
      *
