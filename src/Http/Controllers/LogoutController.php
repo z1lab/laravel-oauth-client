@@ -18,16 +18,17 @@ class LogoutController
         if (Auth::check()) {
             $client = new Client(['base_uri' => config('openid.server')]);
             try {
-                $client->post('/logout');
+                $client->post('/logout',
+                    ['headers' => ['Authorization' => 'Bearer ' . Cookie::get(\OpenID\Client\Client::$access_cookie)]]);
             } catch (\Exception $exception) {
                 return new JsonResponse(['success' => FALSE], 400);
             }
-            Cookie::queue(Cookie::forget(\OpenID\Client\Client::$access_cookie));
-            Cookie::queue(Cookie::forget(\OpenID\Client\Client::$refresh_cookie));
-            Cookie::queue(Cookie::forget(\OpenID\Client\Client::$openid_cookie));
             Request::session()->invalidate();
         }
 
-        return new JsonResponse(['success' => TRUE]);
+        return (new JsonResponse(['success' => TRUE]))
+            ->withCookie(Cookie::forget(\OpenID\Client\Client::$access_cookie))
+            ->withCookie(Cookie::forget(\OpenID\Client\Client::$refresh_cookie))
+            ->withCookie(Cookie::forget(\OpenID\Client\Client::$openid_cookie));
     }
 }
