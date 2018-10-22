@@ -69,7 +69,7 @@ class CallbackController
 
         $minutes = Carbon::createFromTimestamp($token->getClaim('exp'))->diffInMinutes();
 
-        return Redirect::intended()
+        return Redirect::to(Cookie::get('url_intended'))
             ->withCookie(Cookie::make(\OpenID\Client\Client::$access_cookie, $response->access_token, $minutes))
             ->withCookie(Cookie::make(\OpenID\Client\Client::$openid_cookie, $response->id_token, $minutes))
             ->withCookie(Cookie::make(\OpenID\Client\Client::$refresh_cookie, $response->refresh_token, $minutes));
