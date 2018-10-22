@@ -2,17 +2,9 @@
 
 namespace OpenID\Client;
 
-use Carbon\Carbon;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use http\Env\Request;
 use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Client
 {
@@ -33,7 +25,7 @@ class Client
 
     /**
      * @param array $scopes
-     * @return RedirectResponse
+     * @return string
      */
     public function askForToken(array $scopes = [])
     {
@@ -45,7 +37,7 @@ class Client
             'response_type' => 'code',
             'scope'         => implode(' ', $scopes),
         ]);
-        return new RedirectResponse(str_finish(config('openid.server'), '/') . "oauth/authorize?$query");
+        return str_finish(config('openid.server'), '/') . "oauth/authorize?$query";
     }
 
     /**
@@ -58,7 +50,5 @@ class Client
 
         Route::post('openid/refresh', 'OpenID\Client\Http\Controllers\RefreshController@refreshToken')
             ->middleware(EncryptCookies::class)->name('openid.refresh');
-
-        Route::post('logout', 'OpenID\Client\Http\Controllers\LogoutController@logout')->name('logout');
     }
 }
