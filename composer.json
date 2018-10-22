@@ -1,5 +1,5 @@
 {
-    "name": "z1labteam/openid-client",
+    "name": "z1lab/openid-client",
     "description": "OpenID Connect client for Laravel based on Passport.",
     "keywords": [
         "laravel",
