@@ -37,7 +37,7 @@ class Client
             'response_type' => 'code',
             'scope'         => implode(' ', $scopes),
         ]);
-        return base64_encode(str_finish(config('openid.server'), '/') . "oauth/authorize?$query");
+        return str_finish(config('openid.server'), '/') . "oauth/authorize?$query";
     }
 
     /**
