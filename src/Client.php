@@ -51,6 +51,9 @@ class Client
         Route::post('openid/refresh', 'OpenID\Client\Http\Controllers\RefreshController@refreshToken')
             ->middleware(EncryptCookies::class)->name('openid.refresh');
 
+        Route::get('openid/user', 'OpenID\Client\Http\Controllers\ApiController@show')
+            ->middleware(EncryptCookies::class)->name('openid.user');
+
         Route::post('logout', 'OpenID\Client\Http\Controllers\LogoutController@logout')
             ->middleware(EncryptCookies::class)->name('logout');
     }

@@ -49,4 +49,20 @@ class User implements UserContract, MustVerifyEmail
     {
         return;
     }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * @return false|string
+     */
+    public function toJson()
+    {
+        return json_encode($this->attributes);
+    }
 }
