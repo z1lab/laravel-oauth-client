@@ -68,5 +68,8 @@ class Client extends Api
 
         Route::get('account-recovery', 'OpenID\Client\Http\Controllers\LoginController@accountRecovery')
             ->middleware(EncryptCookies::class)->name('account-recovery');
+
+        Route::get('email-confirmation', 'OpenID\Client\Http\Controllers\EmailConfirmationController@index')
+            ->middleware(EncryptCookies::class)->name('email-confirmation');
     }
 }
