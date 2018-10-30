@@ -6,7 +6,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
-class Client
+class Client extends Api
 {
     /**
      * @var string
@@ -53,6 +53,9 @@ class Client
 
         Route::get('openid/user', 'OpenID\Client\Http\Controllers\ApiController@show')
             ->middleware(EncryptCookies::class)->name('openid.user');
+
+        Route::get('password-reset', 'OpenID\Client\Http\Controllers\ResetPasswordController@show')
+            ->middleware(EncryptCookies::class)->name('reset-password');
 
         Route::post('logout', 'OpenID\Client\Http\Controllers\LogoutController@logout')
             ->middleware(EncryptCookies::class)->name('logout');
