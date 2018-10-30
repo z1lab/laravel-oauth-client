@@ -26,7 +26,7 @@ class LogoutController
             $client = new Client(['base_uri' => config('openid.server')]);
 
             try {
-                $client->post('/logout',
+                $client->post('/api/actions/logout',
                     ['headers' => ['Authorization' => 'Bearer ' . Cookie::get(\OpenID\Client\Client::$access_cookie)]]);
             } catch (\Exception $exception) {
                 return new JsonResponse(['success' => FALSE], 400);
