@@ -59,5 +59,14 @@ class Client extends Api
 
         Route::post('logout', 'OpenID\Client\Http\Controllers\LogoutController@logout')
             ->middleware(EncryptCookies::class)->name('logout');
+
+        Route::get('login', 'OpenID\Client\Http\Controllers\LoginController@index')
+            ->middleware(EncryptCookies::class)->name('login');
+
+        Route::get('register', 'OpenID\Client\Http\Controllers\LoginController@register')
+            ->middleware(EncryptCookies::class)->name('register');
+
+        Route::get('account-recovery', 'OpenID\Client\Http\Controllers\LoginController@accountRecovery')
+            ->middleware(EncryptCookies::class)->name('account-recovery');
     }
 }

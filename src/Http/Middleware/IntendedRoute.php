@@ -24,7 +24,7 @@ class IntendedRoute
      **/
     public function handle($request, $next)
     {
-        if ($request->isMethod('GET') && starts_with(Route::currentRouteName(), 'openid')) {
+        if ($request->isMethod('GET') && !starts_with(Route::currentRouteName(), 'openid')) {
             return $next($request)->withCookie(Cookie::make('url_intended', URL::full(), 10));
         }
 
