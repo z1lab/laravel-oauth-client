@@ -2,7 +2,6 @@
 
 namespace OpenID\Client\Http\Controllers;
 
-use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
@@ -10,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
-use Lcobucci\JWT\Parser;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CallbackController
@@ -56,8 +54,6 @@ class CallbackController
             if (isset($response->error)) {
                 throw new HttpException($status, $response['error']);
             }
-            $token = (new Parser())->parse($response->access_token);
-            $refresh_token = (new Parser())->parse($response->refresh_token);
         } catch (\Exception $exception) {
             if ($exception instanceof ServerException || $exception instanceof ClientException) {
                 $result = json_decode($exception->getResponse()->getBody());
@@ -68,12 +64,12 @@ class CallbackController
                 $exception->getMessage());
         }
 
-        $minutes = Carbon::createFromTimestamp($token->getClaim('exp'))->diffInMinutes();
-        $refresh_minutes = Carbon::createFromTimestamp($refresh_token->getClaim('exp'))->diffInMinutes();
+        $minutes = $response->expires_in / 60;
 
         return Redirect::to(Cookie::get('url_intended'))
             ->withCookie(Cookie::make(\OpenID\Client\Client::$access_cookie, $response->access_token, $minutes))
             ->withCookie(Cookie::make(\OpenID\Client\Client::$openid_cookie, $response->id_token, $minutes))
-            ->withCookie(Cookie::make(\OpenID\Client\Client::$refresh_cookie, $response->refresh_token, $refresh_minutes));
+            ->withCookie(Cookie::make(\OpenID\Client\Client::$refresh_cookie, $response->refresh_token,
+                $response->refresh_expires_in / 60));
     }
 }
