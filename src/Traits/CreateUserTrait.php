@@ -5,6 +5,7 @@ namespace OpenID\Client\Traits;
 use Carbon\Carbon;
 use Lcobucci\JWT\Token;
 use OpenID\Client\Address;
+use OpenID\Client\Phone;
 use OpenID\Client\User;
 
 trait CreateUserTrait
@@ -37,7 +38,7 @@ trait CreateUserTrait
         if (filled($attributes['birthdate'])) {
             $attributes['birthdate'] = Carbon::createFromFormat('Y-M-D', $attributes['birthdate']);
         }
-        $attributes['phone'] = $token->getClaim('phone_number');
+        $attributes['phone'] = new Phone($token->getClaim('phone_number'));
         $attributes['phone_verified'] = $token->getClaim('phone_number_verified');
         $attributes['address'] = $token->getClaim('address');
         if (filled($attributes['address'])) {

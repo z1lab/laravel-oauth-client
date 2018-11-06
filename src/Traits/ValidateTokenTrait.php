@@ -19,7 +19,7 @@ trait ValidateTokenTrait
 
         $data = new ValidationData();
         $data->setCurrentTime(Carbon::now()->getTimestamp());
-        $data->setIssuer(config('openid.server'));
+        $data->setIssuer(str_finish(config('openid.server'), '/'));
 
         if ($token->validate($data) && $token->verify(new Sha256(), 'file://' . config('openid.key'))) {
             $audiences = explode(' ', $token->getClaim('aud'));

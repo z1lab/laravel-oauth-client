@@ -57,6 +57,7 @@ class CallbackController
                 throw new HttpException($status, $response['error']);
             }
             $token = (new Parser())->parse($response->access_token);
+            $refresh_token = (new Parser())->parse($response->refresh_token);
         } catch (\Exception $exception) {
             if ($exception instanceof ServerException || $exception instanceof ClientException) {
                 $result = json_decode($exception->getResponse()->getBody());
@@ -68,10 +69,11 @@ class CallbackController
         }
 
         $minutes = Carbon::createFromTimestamp($token->getClaim('exp'))->diffInMinutes();
+        $refresh_minutes = Carbon::createFromTimestamp($refresh_token->getClaim('exp'))->diffInMinutes();
 
         return Redirect::to(Cookie::get('url_intended'))
             ->withCookie(Cookie::make(\OpenID\Client\Client::$access_cookie, $response->access_token, $minutes))
             ->withCookie(Cookie::make(\OpenID\Client\Client::$openid_cookie, $response->id_token, $minutes))
-            ->withCookie(Cookie::make(\OpenID\Client\Client::$refresh_cookie, $response->refresh_token, $minutes));
+            ->withCookie(Cookie::make(\OpenID\Client\Client::$refresh_cookie, $response->refresh_token, $refresh_minutes));
     }
 }
