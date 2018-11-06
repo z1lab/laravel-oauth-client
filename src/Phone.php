@@ -21,12 +21,14 @@ class Phone
 
     /**
      * Phone constructor.
-     * @param string $phone
+     * @param string|NULL $phone
      */
-    public function __construct(string $phone)
+    public function __construct(string $phone = NULL)
     {
-        $phone = preg_replace('/[^0-9]/', '', $phone);
-        $this->attributes['area_code'] = substr($phone, 0, 2);
-        $this->attributes['number'] = substr($phone, 2);
+        if ($phone !== NULL) {
+            $phone = preg_replace('/[^0-9]/', '', $phone);
+            $this->attributes['area_code'] = substr($phone, 0, 2);
+            $this->attributes['number'] = substr($phone, 2);
+        }
     }
 }

@@ -38,7 +38,8 @@ trait CreateUserTrait
         if (filled($attributes['birthdate'])) {
             $attributes['birthdate'] = Carbon::createFromFormat('Y-M-D', $attributes['birthdate']);
         }
-        $attributes['phone'] = new Phone($token->getClaim('phone_number'));
+        $attributes['phone'] = $token->getClaim('phone_number') ?
+            new Phone($token->getClaim('phone_number')) : NULL;
         $attributes['phone_verified'] = $token->getClaim('phone_number_verified');
         $attributes['address'] = $token->getClaim('address');
         if (filled($attributes['address'])) {
