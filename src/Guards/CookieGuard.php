@@ -1,14 +1,14 @@
 <?php
 
-namespace OpenID\Client\Guards;
+namespace Z1lab\OpenID\Guards;
 
 use Carbon\Carbon;
 use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Facades\Cookie;
-use OpenID\Client\Client;
-use OpenID\Client\Traits\CreateUserTrait;
-use OpenID\Client\Traits\ValidateTokenTrait;
+use Z1lab\OpenID\Client;
+use Z1lab\OpenID\Traits\CreateUserTrait;
+use Z1lab\OpenID\Traits\ValidateTokenTrait;
 
 class CookieGuard implements Guard
 {
@@ -19,46 +19,31 @@ class CookieGuard implements Guard
      */
     public function __construct()
     {
-        $this->provider = null;
+        $this->provider = NULL;
     }
 
     /**
-     * Get the currently authenticated user.
-     *
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function user()
     {
         if (!is_null($this->user)) {
-            if ($this->user->expires_at < Carbon::now()) {
-                return null;
-            }
+            if ($this->user->expires_at < Carbon::now()) return NULL;
 
             return $this->user;
         }
 
         $token = Cookie::get(Client::$access_cookie, '');
-
-        if (empty($token)) {
-            return null;
-        }
+        if (empty($token)) return NULL;
 
         $access_token = $this->validateToken($token);
-        if (!$access_token) {
-            return null;
-        }
+        if (!$access_token) return NULL;
 
         $token = Cookie::get(Client::$openid_cookie, '');
-
-        if (empty($token)) {
-            return null;
-        }
+        if (empty($token)) return NULL;
 
         $id_token = $this->validateToken($token);
-
-        if (!$id_token || $id_token->getClaim('sub') !== $access_token->getClaim('sub')) {
-            return null;
-        }
+        if (!$id_token || $id_token->getClaim('sub') !== $access_token->getClaim('sub')) return NULL;
 
         return $this->user = $this->createUserFromToken($id_token);
     }
@@ -71,6 +56,6 @@ class CookieGuard implements Guard
      */
     public function validate(array $credentials = [])
     {
-        return true;
+        return TRUE;
     }
 }

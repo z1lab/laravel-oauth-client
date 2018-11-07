@@ -1,13 +1,13 @@
 <?php
 
-namespace OpenID\Client;
+namespace Z1lab\OpenID;
 
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
-class Client extends Api
+class Client
 {
+    use ApiShortcuts;
+
     /**
      * @var string
      */
@@ -37,39 +37,7 @@ class Client extends Api
             'response_type' => 'code',
             'scope'         => implode(' ', $scopes),
         ]);
+
         return str_finish(config('openid.server'), '/') . "oauth/authorize?$query";
-    }
-
-    /**
-     * @return void
-     */
-    public function routes()
-    {
-        Route::get('openid/callback', 'OpenID\Client\Http\Controllers\CallbackController@callback')
-            ->middleware(EncryptCookies::class)->name('openid.callback');
-
-        Route::post('openid/refresh', 'OpenID\Client\Http\Controllers\RefreshController@refreshToken')
-            ->middleware(EncryptCookies::class)->name('openid.refresh');
-
-        Route::get('openid/user', 'OpenID\Client\Http\Controllers\ApiController@show')
-            ->middleware(EncryptCookies::class)->name('openid.user');
-
-        Route::get('password-reset', 'OpenID\Client\Http\Controllers\ResetPasswordController@show')
-            ->middleware(EncryptCookies::class)->name('reset-password');
-
-        Route::post('logout', 'OpenID\Client\Http\Controllers\LogoutController@logout')
-            ->middleware(EncryptCookies::class)->name('logout');
-
-        Route::get('login', 'OpenID\Client\Http\Controllers\LoginController@index')
-            ->middleware(EncryptCookies::class)->name('login');
-
-        Route::get('register', 'OpenID\Client\Http\Controllers\LoginController@register')
-            ->middleware(EncryptCookies::class)->name('register');
-
-        Route::get('account-recovery', 'OpenID\Client\Http\Controllers\LoginController@accountRecovery')
-            ->middleware(EncryptCookies::class)->name('account-recovery');
-
-        Route::get('email-confirmation', 'OpenID\Client\Http\Controllers\EmailConfirmationController@index')
-            ->middleware(EncryptCookies::class)->name('email-confirmation');
     }
 }

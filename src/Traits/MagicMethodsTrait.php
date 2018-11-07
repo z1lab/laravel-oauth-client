@@ -1,13 +1,13 @@
 <?php
 
-namespace OpenID\Client\Traits;
+namespace Z1lab\OpenID\Traits;
 
 trait MagicMethodsTrait
 {
     /**
      * Dynamically access the user's attributes.
      *
-     * @param  string  $key
+     * @param  string $key
      * @return mixed
      */
     public function __get($key)
@@ -18,7 +18,7 @@ trait MagicMethodsTrait
     /**
      * Dynamically set an attribute on the user.
      *
-     * @param  string  $key
+     * @param  string $key
      * @param  mixed  $value
      * @return void
      */
@@ -30,7 +30,7 @@ trait MagicMethodsTrait
     /**
      * Dynamically check if a value is set on the user.
      *
-     * @param  string  $key
+     * @param  string $key
      * @return bool
      */
     public function __isset($key)
@@ -41,7 +41,7 @@ trait MagicMethodsTrait
     /**
      * Dynamically unset a value on the user.
      *
-     * @param  string  $key
+     * @param  string $key
      * @return void
      */
     public function __unset($key)

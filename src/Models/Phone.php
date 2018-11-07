@@ -6,9 +6,9 @@
  * Time: 11:23
  */
 
-namespace OpenID\Client;
+namespace Z1lab\OpenID\Models;
 
-use OpenID\Client\Traits\MagicMethodsTrait;
+use Z1lab\OpenID\Traits\MagicMethodsTrait;
 
 class Phone
 {
@@ -21,14 +21,26 @@ class Phone
 
     /**
      * Phone constructor.
+     *
      * @param string|NULL $phone
      */
     public function __construct(string $phone = NULL)
     {
         if ($phone !== NULL) {
+            $this->attributes['formatted'] = $phone;
+
             $phone = preg_replace('/[^0-9]/', '', $phone);
+
             $this->attributes['area_code'] = substr($phone, 0, 2);
             $this->attributes['number'] = substr($phone, 2);
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->attributes;
     }
 }

@@ -6,7 +6,7 @@
  * Time: 18:52
  */
 
-namespace OpenID\Client\Http\Controllers;
+namespace Z1lab\OpenID\Http\Controllers;
 
 
 use Illuminate\Http\Request;

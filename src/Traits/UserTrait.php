@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenID\Client\Traits;
+namespace Z1lab\OpenID\Traits;
 
 trait UserTrait
 {
@@ -8,16 +8,6 @@ trait UserTrait
      * @var array
      */
     protected $attributes;
-
-    /**
-     * Get the name of the unique identifier for the user.
-     *
-     * @return string
-     */
-    public function getAuthIdentifierName()
-    {
-        return 'id';
-    }
 
     /**
      * Get the unique identifier for the user.
@@ -30,13 +20,23 @@ trait UserTrait
     }
 
     /**
+     * Get the name of the unique identifier for the user.
+     *
+     * @return string
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'id';
+    }
+
+    /**
      * Get the password for the user.
      *
      * @return string
      */
     public function getAuthPassword()
     {
-        return null;
+        return NULL;
     }
 
     /**
@@ -46,7 +46,7 @@ trait UserTrait
      */
     public function getRememberToken()
     {
-        return null;
+        return NULL;
     }
 
     /**
@@ -67,6 +67,6 @@ trait UserTrait
      */
     public function getRememberTokenName()
     {
-        return null;
+        return NULL;
     }
 }

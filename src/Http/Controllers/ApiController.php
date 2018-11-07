@@ -6,9 +6,10 @@
  * Time: 16:32
  */
 
-namespace OpenID\Client\Http\Controllers;
+namespace Z1lab\OpenID\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
+use Z1lab\OpenID\Http\Resources\User;
 
 class ApiController
 {
@@ -17,8 +18,6 @@ class ApiController
      */
     public function show()
     {
-        if (Auth::check()) return Auth::user()->toJson();
-        
-        return json_encode([]);
+        return new User(collect(Auth::user()->toArray()));
     }
 }

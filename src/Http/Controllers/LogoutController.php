@@ -6,14 +6,14 @@
  * Time: 17:39
  */
 
-namespace OpenID\Client\Http\Controllers;
-
+namespace Z1lab\OpenID\Http\Controllers;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Request;
+use Z1lab\OpenID\Client as OpenID;
 
 class LogoutController
 {
@@ -24,18 +24,26 @@ class LogoutController
     {
         if (Auth::check()) {
             $client = new Client(['base_uri' => config('openid.server')]);
+            $headers = [
+                'Authorization' => 'Bearer ' . Cookie::get(OpenID::$access_cookie),
+            ];
 
             try {
-                $client->post('/api/actions/logout',
-                    ['headers' => ['Authorization' => 'Bearer ' . Cookie::get(\OpenID\Client\Client::$access_cookie)]]);
-            } catch (\Exception $exception) {
-                return new JsonResponse(['success' => FALSE], 400);
+                $client->post('/api/actions/logout', ['headers' => $headers]);
+            } catch (\Exception $e) {
+                return new JsonResponse([], Response::HTTP_UNAUTHORIZED);
             }
         }
 
-        return (new JsonResponse(['success' => TRUE]))
-            ->withCookie(Cookie::forget(\OpenID\Client\Client::$access_cookie))
-            ->withCookie(Cookie::forget(\OpenID\Client\Client::$refresh_cookie))
-            ->withCookie(Cookie::forget(\OpenID\Client\Client::$openid_cookie));
+        return (new JsonResponse())
+            ->withCookie(
+                Cookie::forget(OpenID::$access_cookie)
+            )
+            ->withCookie(
+                Cookie::forget(OpenID::$refresh_cookie)
+            )
+            ->withCookie(
+                Cookie::forget(OpenID::$openid_cookie)
+            );
     }
 }

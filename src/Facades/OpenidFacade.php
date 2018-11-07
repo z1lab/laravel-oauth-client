@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenID\Client\Facades;
+namespace Z1lab\OpenID\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

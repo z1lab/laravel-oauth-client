@@ -9,11 +9,10 @@
 namespace OpenID\Client\Http\Controllers;
 
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cookie;
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
-use OlimarFerraz\LaravelMeta\Facade as Meta;
+use Z1lab\LaravelMeta\Facade as Meta;
 
 class EmailConfirmationController
 {
@@ -28,7 +27,7 @@ class EmailConfirmationController
 
         $client = new Client(['base_uri' => config('openid.server')]);
         $status = FALSE;
-        
+
         try {
             $client->get(base64_decode($request->get('token')));
             $status = TRUE;

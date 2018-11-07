@@ -8,10 +8,10 @@
 
 namespace OpenID\Client\Http\Controllers;
 
-use OlimarFerraz\LaravelMeta\Facade as Meta;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\View\View;
+use Z1lab\LaravelMeta\Facade as Meta;
 
 class LoginController
 {
@@ -20,7 +20,7 @@ class LoginController
      */
     public function index()
     {
-        if(Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
+        if (Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
 
         Meta::set('title', __('Login form'));
 
@@ -32,7 +32,7 @@ class LoginController
      */
     public function register()
     {
-        if(Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
+        if (Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
 
         Meta::set('title', __('Register form'));
 
@@ -44,7 +44,7 @@ class LoginController
      */
     public function accountRecovery()
     {
-        if(Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
+        if (Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
 
         Meta::set('title', __('Account recovery form'));
 

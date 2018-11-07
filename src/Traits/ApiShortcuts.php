@@ -6,30 +6,16 @@
  * Time: 22:59
  */
 
-namespace OpenID\Client;
+namespace Z1lab\OpenID;
 
-
-class Api
+trait ApiShortcuts
 {
-    /**
-     * @var string 
-     */
-    protected $server;
-
-    /**
-     * Api constructor.
-     */
-    public function __construct() 
-    {
-        $this->server = str_finish(config('openid.server'), '/') . 'api/actions/';
-    }
-
     /**
      * @return string
      */
     public function loginRoute()
     {
-        return $this->server . 'login';
+        return $this->apiActions() . 'login';
     }
 
     /**
@@ -37,7 +23,7 @@ class Api
      */
     public function logoutRoute()
     {
-        return $this->server . 'logout';
+        return $this->apiActions() . 'logout';
     }
 
     /**
@@ -45,7 +31,7 @@ class Api
      */
     public function registerRoute()
     {
-        return $this->server . 'register';
+        return $this->apiActions() . 'register';
     }
 
     /**
@@ -53,7 +39,7 @@ class Api
      */
     public function recoveryRoute()
     {
-        return $this->server . 'recovery';
+        return $this->apiActions() . 'recovery';
     }
 
     /**
@@ -61,6 +47,14 @@ class Api
      */
     public function resetRoute()
     {
-        return $this->server . 'recovery/reset';
+        return $this->apiActions() . 'recovery/reset';
+    }
+
+    /**
+     * Api constructor.
+     */
+    private function apiActions()
+    {
+        return str_finish(config('openid.server'), '/') . 'api/actions/';
     }
 }

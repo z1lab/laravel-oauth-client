@@ -1,11 +1,11 @@
 <?php
 
-namespace OpenID\Client;
+namespace Z1lab\OpenID\Models;
 
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use OpenID\Client\Traits\MagicMethodsTrait;
-use OpenID\Client\Traits\UserTrait;
+use Z1lab\OpenID\Traits\MagicMethodsTrait;
+use Z1lab\OpenID\Traits\UserTrait;
 
 class User implements UserContract, MustVerifyEmail
 {
@@ -13,6 +13,7 @@ class User implements UserContract, MustVerifyEmail
 
     /**
      * User constructor.
+     *
      * @param $attributes
      */
     public function __construct($attributes)
@@ -37,7 +38,7 @@ class User implements UserContract, MustVerifyEmail
      */
     public function markEmailAsVerified()
     {
-        return false;
+        return FALSE;
     }
 
     /**
@@ -55,14 +56,15 @@ class User implements UserContract, MustVerifyEmail
      */
     public function toArray()
     {
-        return $this->attributes;
-    }
+        $data = $this->attributes;
 
-    /**
-     * @return false|string
-     */
-    public function toJson()
-    {
-        return json_encode($this->attributes);
+        $data['expires_at'] = $this->expires_at->format('Y-m-d H:i:s');
+        $data['auth_time'] = $this->auth_time->format('Y-m-d H:i:s');
+        $data['updated_at'] = $this->updated_at->format('Y-m-d H:i:s');
+
+        $data['address'] = NULL !== $this->address ? $this->address->toArray() : NULL;
+        $data['phone'] = NULL !== $this->phone ? $this->phone->toArray() : NULL;
+
+        return $data;
     }
 }

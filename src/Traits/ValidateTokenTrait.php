@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenID\Client\Traits;
+namespace Z1lab\OpenID\Traits;
 
 use Carbon\Carbon;
 use Lcobucci\JWT\Parser;
@@ -18,6 +18,7 @@ trait ValidateTokenTrait
         $token = (new Parser())->parse($jwt);
 
         $data = new ValidationData();
+
         $data->setCurrentTime(Carbon::now()->getTimestamp());
         $data->setIssuer(str_finish(config('openid.server'), '/'));
 
@@ -27,6 +28,6 @@ trait ValidateTokenTrait
             return $token;
         }
 
-        return null;
+        return NULL;
     }
 }

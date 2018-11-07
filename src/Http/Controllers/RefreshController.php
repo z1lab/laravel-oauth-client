@@ -6,13 +6,12 @@
  * Time: 19:14
  */
 
-namespace OpenID\Client\Http\Controllers;
+namespace Z1lab\OpenID\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
-use OpenID\Client\Client;
+use Z1lab\OpenID\Client;
 
 class RefreshController
 {
@@ -23,32 +22,51 @@ class RefreshController
     public function refreshToken(Request $request)
     {
         $refresh_token = Cookie::get(Client::$refresh_cookie, '');
-        if (empty($refresh_token)) {
-            return new JsonResponse(['success' => false], 400);
-        }
+
+        if (empty($refresh_token)) return new JsonResponse(['success' => FALSE], 401);
 
         $scopes = 'openid' . $request->filled('scopes') ? (' ' . $request->get('scopes')) : '';
         $client = new \GuzzleHttp\Client(['base_uri' => config('openid.server')]);
-        try {
-            $respone = $client->post('/oauth/token', [
-                'form_params' => [
-                    'grant_type' => 'refresh_token',
-                    'refresh_token' => $refresh_token,
-                    'client_id' => config('openid.client.id'),
-                    'client_secret' => config('openid.client.secret'),
-                    'scope' => $scopes,
-                ]
-            ]);
-            $result = json_decode($respone->getBody());
-            $expires = Carbon::now()->addSeconds($result->expires_in);
-            $respone = new JsonResponse(['success' => true]);
-            $minutes = $expires->diffInMinutes();
 
-            return $respone->withCookie(Cookie::make(Client::$access_cookie, $result->access_token, $minutes))
-                ->withCookie(Cookie::make(Client::$openid_cookie, $result->id_token, $minutes))
-                ->withCookie(Cookie::make(Client::$refresh_cookie, $result->refresh_token, $minutes));
-        } catch (\Exception $exception) {
-            return new JsonResponse(['success' => false], 400);
+        $params = [
+            'grant_type'    => 'refresh_token',
+            'refresh_token' => $refresh_token,
+            'client_id'     => config('openid.client.id'),
+            'client_secret' => config('openid.client.secret'),
+            'scope'         => $scopes,
+        ];
+
+        try {
+            $response = $client->post('/oauth/token', ['form_params' => $params]);
+
+            $result = json_decode($response->getBody());
+            $auth_expires = $result->expires_in / 60;
+            $refresh_expires = $result->refresh_expires_in / 60;
+
+            return (new JsonResponse(['success' => TRUE]))
+                ->withCookie(
+                    Cookie::make(
+                        Client::$access_cookie,
+                        $result->access_token,
+                        $auth_expires
+                    )
+                )
+                ->withCookie(
+                    Cookie::make(
+                        Client::$openid_cookie,
+                        $result->id_token,
+                        $auth_expires
+                    )
+                )
+                ->withCookie(
+                    Cookie::make(
+                        Client::$refresh_cookie,
+                        $result->refresh_token,
+                        $refresh_expires
+                    )
+                );
+        } catch (\Exception $e) {
+            return new JsonResponse([], 401);
         }
     }
 }
