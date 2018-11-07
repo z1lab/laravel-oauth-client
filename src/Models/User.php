@@ -12,6 +12,11 @@ class User implements UserContract, MustVerifyEmail
     use UserTrait, MagicMethodsTrait;
 
     /**
+     * @var string
+     */
+    protected $dateFormat = 'Y-m-d H:i:s';
+
+    /**
      * User constructor.
      *
      * @param $attributes
@@ -58,9 +63,9 @@ class User implements UserContract, MustVerifyEmail
     {
         $data = array_except($this->attributes, ['address']);
 
-        $data['expires_at'] = $this->expires_at->format('Y-m-d H:i:s');
-        $data['auth_time'] = $this->auth_time->format('Y-m-d H:i:s');
-        $data['updated_at'] = $this->updated_at->format('Y-m-d H:i:s');
+        $data['expires_at'] = $this->expires_at->format($this->dateFormat);
+        $data['auth_time'] = $this->auth_time->format($this->dateFormat);
+        $data['updated_at'] = $this->updated_at->format($this->dateFormat);
         $data['phone'] = NULL !== $this->phone ? $this->phone->toArray() : NULL;
 
         $data['relationships']['address'] = NULL !== $this->address ? $this->address->toArray() : NULL;
