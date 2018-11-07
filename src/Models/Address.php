@@ -23,6 +23,8 @@ class Address
         'state',
         'postal_code',
         'formatted',
+        'created_at',
+        'updated_at',
     ];
 
     /**
