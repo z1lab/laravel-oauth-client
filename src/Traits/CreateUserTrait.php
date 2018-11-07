@@ -18,50 +18,11 @@ trait CreateUserTrait
     {
         $attributes = [];
 
-        $this->strings($attributes, $token);
+        $this->defaults($attributes, $token);
         $this->timestamps($attributes, $token);
-        $this->booleans($attributes, $token);
         $this->address($attributes, $token);
         $this->phone($attributes, $token);
         $this->roles($attributes, $token);
-
-        /*$attributes['id'] = $token->getClaim('sub');
-        $attributes['name'] = $token->getClaim('name');
-        $attributes['social_name'] = $token->getClaim('social_name');
-        $attributes['nickname'] = $token->getClaim('nickname');
-        $attributes['username'] = $token->getClaim('preferred_username');
-        $attributes['avatar'] = $token->getClaim('picture');
-        $attributes['email'] = $token->getClaim('email');
-        $attributes['gender'] = $token->getClaim('gender');
-
-        $attributes['email_verified'] = $token->getClaim('email_verified');
-        if ($attributes['email_verified'] === 'false') {
-            $attributes['email_verified'] = FALSE;
-        } else {
-            $attributes['email_verified'] = (bool)$attributes['email_verified'];
-        }
-        $attributes['phone_verified'] = $token->getClaim('phone_number_verified');
-
-        $attributes['expires_at'] = Carbon::createFromTimestamp($token->getClaim('exp'));
-        $attributes['auth_time'] = Carbon::createFromTimestamp($token->getClaim('auth_time'));
-        $attributes['updated_at'] = Carbon::createFromTimestamp($token->getClaim('updated_at'));
-        $attributes['birthdate'] = $token->getClaim('birthdate');
-        if (filled($attributes['birthdate'])) $attributes['birthdate'] = Carbon::createFromFormat('Y-M-D', $attributes['birthdate']);
-
-
-        $attributes['phone'] = $token->getClaim('phone_number') ? new Phone($token->getClaim('phone_number')) : NULL;
-
-        $attributes['address'] = $token->getClaim('address');
-        if (filled($attributes['address'])) $attributes['address'] = new Address(json_decode($attributes['address'], TRUE));
-
-
-        $attributes['roles'] = [];
-
-        $roles = explode(' ', $token->getClaim('roles'));
-
-        foreach ($roles as $role) {
-            if (!empty($role)) $attributes['roles'][] = $role;
-        }*/
 
         return new User($attributes);
     }
@@ -70,7 +31,7 @@ trait CreateUserTrait
      * @param array $attributes
      * @param Token $token
      */
-    private function strings(array &$attributes, Token $token)
+    private function defaults(array &$attributes, Token $token)
     {
         $map = [
             'id'          => 'sub',
@@ -80,6 +41,8 @@ trait CreateUserTrait
             'username'    => 'preferred_username',
             'avatar'      => 'picture',
             'email'       => 'email',
+            'email_verified' => 'email_verified',
+            'phone_verified' => 'phone_number_verified',
         ];
 
         foreach ($map as $key => $value) {
@@ -107,24 +70,6 @@ trait CreateUserTrait
 
         if (filled($attributes['birthdate']))
             $attributes['birthdate'] = Carbon::createFromFormat('Y-M-D', $attributes['birthdate']);
-    }
-
-    /**
-     * @param array $attributes
-     * @param Token $token
-     */
-    private function booleans(array &$attributes, Token $token)
-    {
-        $map = [
-            'email_verified' => 'email_verified',
-            'phone_verified' => 'phone_number_verified',
-        ];
-
-        foreach ($map as $key => $value) {
-            $attributes[$key] = $token->getClaim($value) === 'false'
-                ? FALSE
-                : TRUE;
-        }
     }
 
     /**
