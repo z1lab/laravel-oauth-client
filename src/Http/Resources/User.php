@@ -19,6 +19,23 @@ class User extends Resource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'type' => 'users',
+            'id' => $this->resource['id'],
+            'attributes' => parent::toArray($request)
+        ];
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     */
+    public function with($request)
+    {
+        return [
+            'links' => [
+                'self' => route('openid.user')
+            ]
+        ];
     }
 }

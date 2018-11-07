@@ -6,7 +6,7 @@
  * Time: 18:13
  */
 
-namespace OpenID\Client\Http\Controllers;
+namespace Z1lab\OpenID\Http\Controllers;
 
 
 use GuzzleHttp\Client;

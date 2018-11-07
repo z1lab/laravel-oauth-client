@@ -88,8 +88,8 @@ class OpenIDServiceProvider extends ServiceProvider
     protected function registerConfig()
     {
         $this->publishes([
-            __DIR__ . '/../config/openid.php' => config_path('openid.php'),
+            __DIR__ . '/../../config/openid.php' => config_path('openid.php'),
         ], 'openid-config');
-        $this->mergeConfigFrom(__DIR__ . '/../config/openid.php', 'openid');
+        $this->mergeConfigFrom(__DIR__ . '/../../config/openid.php', 'openid');
     }
 }

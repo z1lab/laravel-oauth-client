@@ -56,14 +56,14 @@ class User implements UserContract, MustVerifyEmail
      */
     public function toArray()
     {
-        $data = $this->attributes;
+        $data = array_except($this->attributes, ['address']);
 
         $data['expires_at'] = $this->expires_at->format('Y-m-d H:i:s');
         $data['auth_time'] = $this->auth_time->format('Y-m-d H:i:s');
         $data['updated_at'] = $this->updated_at->format('Y-m-d H:i:s');
-
-        $data['address'] = NULL !== $this->address ? $this->address->toArray() : NULL;
         $data['phone'] = NULL !== $this->phone ? $this->phone->toArray() : NULL;
+
+        $data['relationships']['address'] = NULL !== $this->address ? $this->address->toArray() : NULL;
 
         return $data;
     }

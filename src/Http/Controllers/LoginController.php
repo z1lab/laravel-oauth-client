@@ -6,7 +6,7 @@
  * Time: 15:55
  */
 
-namespace OpenID\Client\Http\Controllers;
+namespace Z1lab\OpenID\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
