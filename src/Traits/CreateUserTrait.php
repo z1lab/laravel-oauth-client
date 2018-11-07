@@ -34,13 +34,13 @@ trait CreateUserTrait
     private function defaults(array &$attributes, Token $token)
     {
         $map = [
-            'id'          => 'sub',
-            'name'        => 'name',
-            'social_name' => 'social_name',
-            'nickname'    => 'nickname',
-            'username'    => 'preferred_username',
-            'avatar'      => 'picture',
-            'email'       => 'email',
+            'id'             => 'sub',
+            'name'           => 'name',
+            'social_name'    => 'social_name',
+            'nickname'       => 'nickname',
+            'username'       => 'preferred_username',
+            'avatar'         => 'picture',
+            'email'          => 'email',
             'email_verified' => 'email_verified',
             'phone_verified' => 'phone_number_verified',
         ];
@@ -78,7 +78,9 @@ trait CreateUserTrait
      */
     private function address(array &$attributes, Token $token)
     {
-        $attributes['address'] = new Address(json_decode($token->getClaim('address'), TRUE));
+        $attributes['address'] = $token->getClaim('address')
+            ? new Address(json_decode($token->getClaim('address'), TRUE))
+            : NULL;
     }
 
     /**

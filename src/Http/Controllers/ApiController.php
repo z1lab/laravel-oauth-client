@@ -10,6 +10,7 @@ namespace Z1lab\OpenID\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Z1lab\OpenID\Http\Resources\User;
+use Illuminate\Http\JsonResponse;
 
 class ApiController
 {
@@ -18,6 +19,8 @@ class ApiController
      */
     public function show()
     {
-        return new User(collect(Auth::user()->toArray()));
+        if(Auth::check()) return new User(collect(Auth::user()->toArray()));
+
+        return new JsonResponse();
     }
 }

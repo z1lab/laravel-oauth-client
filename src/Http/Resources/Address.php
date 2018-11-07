@@ -13,12 +13,23 @@ use Illuminate\Http\Resources\Json\Resource;
 
 class Address extends Resource
 {
+    /**
+     * @var string
+     */
     private $apiNamespace = 'api/v1';
-
+    /**
+     * @var string
+     */
     private $parent = 'users';
-
+    /**
+     * @var string
+     */
     private $type = 'addresses';
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     */
     public function toArray($request)
     {
         return [

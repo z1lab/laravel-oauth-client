@@ -14,18 +14,24 @@ use Illuminate\Http\Resources\Json\Resource;
 class User extends Resource
 {
     /**
+     * @var string
+     */
+    private $apiNamespace = 'api/v1';
+    /**
+     * @var string
+     */
+    private $type = 'users';
+
+    /**
      * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function toArray($request)
     {
-        return [
-            'type'          => $this->type,
-            'id'            => $this->resource['id'],
-            'relationships' => [
-                'address' => new Address($this->resource),
-            ],
-            'attributes'    => [
+        $data = [
+            'type'       => $this->type,
+            'id'         => $this->resource['id'],
+            'attributes' => [
                 'id'             => $this->resource['id'],
                 'name'           => $this->resource['name'],
                 'social_name'    => $this->resource['social_name'],
@@ -43,6 +49,12 @@ class User extends Resource
                 'expires_at'     => $this->resource['expires_at'],
             ],
         ];
+
+        $data['relationships']['address'] = $this->resource['relationships']['address'] !== NULL
+            ? new Address($this->resource)
+            : NULL;
+
+        return $data;
     }
 
     /**
