@@ -25,8 +25,8 @@ class CheckForAnyRole
     {
         if (!$request->user()) throw new AuthenticationException;
 
-        foreach ($roles as $scope) {
-            if ($request->user()->tokenCan($scope)) return $next($request);
+        foreach ($roles as $role) {
+            if (in_array($role, $request->user()->roles)) return $next($request);
         }
 
         throw new MissingRoleException($roles);

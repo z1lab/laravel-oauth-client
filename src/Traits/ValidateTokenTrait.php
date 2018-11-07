@@ -25,7 +25,7 @@ trait ValidateTokenTrait
         if ($token->validate($data) && $token->verify(new Sha256(), 'file://' . config('openid.key'))) {
             $audiences = explode(' ', $token->getClaim('aud'));
 
-            return $token;
+            if (in_array(config('openid.client.id'), $audiences)) return $token;
         }
 
         return NULL;

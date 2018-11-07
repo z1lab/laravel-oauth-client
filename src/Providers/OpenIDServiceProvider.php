@@ -2,12 +2,8 @@
 
 namespace Z1lab\OpenID\Providers;
 
-use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\RequestGuard;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Z1lab\OpenID\Guards\CookieGuard;
 use Z1lab\OpenID\Guards\TokenGuard;
@@ -22,24 +18,8 @@ class OpenIDServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->deleteCookieOnLogout();
-
         $this->app->singleton('openid', function ($app) {
             return new Client();
-        });
-    }
-
-    /**
-     * Register the cookie deletion event handler.
-     *
-     * @return void
-     */
-    protected function deleteCookieOnLogout()
-    {
-        Event::listen(Logout::class, function () {
-            if (Request::hasCookie(Client::$access_cookie)) Cookie::queue(Cookie::forget(Client::$access_cookie));
-
-            if (Request::hasCookie(Client::$openid_cookie)) Cookie::queue(Cookie::forget(Client::$openid_cookie));
         });
     }
 
@@ -48,7 +28,7 @@ class OpenIDServiceProvider extends ServiceProvider
         $this->registerGuards();
         $this->registerConfig();
 
-        $this->app->register(RouteServiceProvider::class);
+        if (config('openid.register')) $this->app->register(RouteServiceProvider::class);
     }
 
     /**
