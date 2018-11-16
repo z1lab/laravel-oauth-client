@@ -10,4 +10,4 @@ storage/*.key
 .env
 Homestead.yaml
 Homestead.json
-
+/composer.lock

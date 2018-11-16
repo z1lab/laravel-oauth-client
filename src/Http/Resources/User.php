@@ -34,6 +34,7 @@ class User extends Resource
             'attributes' => [
                 'id'             => $this->resource['id'],
                 'name'           => $this->resource['name'],
+                'document'       => $this->resource['document'],
                 'social_name'    => $this->resource['social_name'],
                 'nickname'       => $this->resource['nickname'],
                 'username'       => $this->resource['username'],

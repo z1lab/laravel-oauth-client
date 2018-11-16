@@ -43,6 +43,7 @@ trait CreateUserTrait
             'email'          => 'email',
             'email_verified' => 'email_verified',
             'phone_verified' => 'phone_number_verified',
+            'document'       => 'document'
         ];
 
         foreach ($map as $key => $value) {
