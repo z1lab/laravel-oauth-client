@@ -4,8 +4,6 @@ namespace Z1lab\OpenID\Traits;
 
 use Carbon\Carbon;
 use Lcobucci\JWT\Token;
-use Z1lab\OpenID\Models\Address;
-use Z1lab\OpenID\Models\Phone;
 use Z1lab\OpenID\Models\User;
 
 trait CreateUserTrait
@@ -20,8 +18,6 @@ trait CreateUserTrait
 
         $this->defaults($attributes, $token);
         $this->timestamps($attributes, $token);
-        $this->address($attributes, $token);
-        $this->phone($attributes, $token);
         $this->roles($attributes, $token);
 
         return new User($attributes);
@@ -36,14 +32,12 @@ trait CreateUserTrait
         $map = [
             'id'             => 'sub',
             'name'           => 'name',
-            'social_name'    => 'social_name',
             'nickname'       => 'nickname',
-            'username'       => 'preferred_username',
             'avatar'         => 'picture',
             'email'          => 'email',
             'email_verified' => 'email_verified',
             'phone_verified' => 'phone_number_verified',
-            'document'       => 'document'
+            'document'       => 'document',
         ];
 
         foreach ($map as $key => $value) {
@@ -71,28 +65,6 @@ trait CreateUserTrait
 
         if (filled($attributes['birthdate']))
             $attributes['birthdate'] = Carbon::createFromFormat('Y-M-D', $attributes['birthdate']);
-    }
-
-    /**
-     * @param       $attributes
-     * @param Token $token
-     */
-    private function address(array &$attributes, Token $token)
-    {
-        $attributes['address'] = $token->getClaim('address')
-            ? new Address(json_decode($token->getClaim('address'), TRUE))
-            : NULL;
-    }
-
-    /**
-     * @param       $attributes
-     * @param Token $token
-     */
-    private function phone(array &$attributes, Token $token)
-    {
-        $attributes['phone'] = $token->getClaim('phone_number')
-            ? new Phone($token->getClaim('phone_number'))
-            : NULL;
     }
 
     /**

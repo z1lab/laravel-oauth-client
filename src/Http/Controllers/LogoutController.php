@@ -14,6 +14,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Z1lab\OpenID\Client as OpenID;
+use Z1lab\OpenID\Services\ApiService;
 
 class LogoutController
 {
@@ -34,6 +35,8 @@ class LogoutController
                 return new JsonResponse([], Response::HTTP_UNAUTHORIZED);
             }
         }
+
+        (new ApiService)->forgetUser();
 
         return (new JsonResponse())
             ->withCookie(
