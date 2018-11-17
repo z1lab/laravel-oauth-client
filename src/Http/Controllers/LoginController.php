@@ -20,7 +20,7 @@ class LoginController
      */
     public function index()
     {
-        if (Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
+        $this->checkLogged();
 
         Meta::set('title', __('Login form'));
 
@@ -32,7 +32,7 @@ class LoginController
      */
     public function register()
     {
-        if (Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
+        $this->checkLogged();
 
         Meta::set('title', __('Register form'));
 
@@ -44,11 +44,19 @@ class LoginController
      */
     public function accountRecovery()
     {
-        if (Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
+        $this->checkLogged();
 
         Meta::set('title', __('Account recovery form'));
 
         return View('auth.account-recovery');
+    }
+
+    /**
+     * @return mixed
+     */
+    private function checkLogged()
+    {
+        if (Auth::check()) return redirect(Cookie::get('url_intended', route('home')));
     }
 
 

@@ -9,8 +9,9 @@
 namespace Z1lab\OpenID\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use Z1lab\OpenID\Http\Resources\User;
 use Illuminate\Http\JsonResponse;
+use Z1lab\OpenID\Services\ApiService;
+use Illuminate\Support\Facades\Cookie;
 
 class ApiController
 {
@@ -19,8 +20,10 @@ class ApiController
      */
     public function show()
     {
-        if(Auth::check()) return new User(collect(Auth::user()->toArray()));
+        $user = [];
 
-        return new JsonResponse();
+        if (Auth::check()) $user = (new ApiService)->getUser(Cookie::get('auth_token'));
+
+        return new JsonResponse($user);
     }
 }

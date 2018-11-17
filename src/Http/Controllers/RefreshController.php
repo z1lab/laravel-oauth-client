@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cookie;
 use Z1lab\OpenID\Client;
-use Z1lab\OpenID\Http\Resources\User;
+use Z1lab\OpenID\Services\ApiService;
 use Z1lab\OpenID\Traits\CreateUserTrait;
 use Z1lab\OpenID\Traits\ValidateTokenTrait;
 
@@ -48,11 +48,9 @@ class RefreshController
             $auth_expires = $result->expires_in / 60;
             $refresh_expires = $result->refresh_expires_in / 60;
 
-            $user = $this->createUserFromToken($this->validateToken($result->id_token));
+            $user = (new ApiService)->refreshUser($result->access_token);
 
-            $data = collect($user->toArray());
-
-            return (new User($data))->response()
+            return (new JsonResponse($user))
                 ->withCookie(
                     Cookie::make(
                         Client::$access_cookie,
