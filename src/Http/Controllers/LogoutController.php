@@ -30,13 +30,13 @@ class LogoutController
             ];
 
             try {
+                (new ApiService)->forgetUser();
+
                 $client->post('/api/actions/logout', ['headers' => $headers]);
             } catch (\Exception $e) {
                 return new JsonResponse([], Response::HTTP_UNAUTHORIZED);
             }
         }
-
-        (new ApiService)->forgetUser();
 
         return (new JsonResponse())
             ->withCookie(
