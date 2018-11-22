@@ -33,9 +33,13 @@ class ApiService
      */
     public function getUser(string $token)
     {
-        return Cache::rememberForever($this->cacheKey, function () use ($token){
-            return $this->findUser($token);
-        });
+        if(config('app.env') !== 'production') {
+            return Cache::rememberForever($this->cacheKey, function () use ($token){
+                return $this->findUser($token);
+            });
+        }
+
+        return $this->findUser($token);
     }
 
     /**
