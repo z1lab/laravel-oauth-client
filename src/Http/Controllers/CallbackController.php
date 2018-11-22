@@ -54,14 +54,22 @@ class CallbackController
                 Cookie::make(
                     OpenID::$access_cookie,
                     $response->access_token,
-                    $auth_expires
+                    $auth_expires,
+                    NULL,
+                    NULL,
+                    FALSE,
+                    FALSE
                 )
             )
             ->withCookie(
                 Cookie::make(
                     OpenID::$openid_cookie,
                     $response->id_token,
-                    $auth_expires
+                    $auth_expires,
+                    NULL,
+                    NULL,
+                    FALSE,
+                    FALSE
                 )
             )
             ->withCookie(

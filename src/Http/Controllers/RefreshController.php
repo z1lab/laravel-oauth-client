@@ -55,14 +55,22 @@ class RefreshController
                     Cookie::make(
                         Client::$access_cookie,
                         $result->access_token,
-                        $auth_expires
+                        $auth_expires,
+                        NULL,
+                        NULL,
+                        FALSE,
+                        FALSE
                     )
                 )
                 ->withCookie(
                     Cookie::make(
                         Client::$openid_cookie,
                         $result->id_token,
-                        $auth_expires
+                        $auth_expires,
+                        NULL,
+                        NULL,
+                        FALSE,
+                        FALSE
                     )
                 )
                 ->withCookie(

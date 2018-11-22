@@ -2,7 +2,6 @@
 
 namespace Z1lab\OpenID\Providers;
 
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
@@ -49,14 +48,14 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('openid')
             ->as('openid.')
-            ->middleware(EncryptCookies::class)
+            ->middleware('web')
             ->namespace($this->namespace)
             ->group(__DIR__ . '/../Routes/openid.php');
     }
 
     protected function mapClientRoutes()
     {
-        Route::middleware(EncryptCookies::class)
+        Route::middleware('api')
             ->namespace($this->namespace)
             ->group(__DIR__ . '/../Routes/api.php');
     }

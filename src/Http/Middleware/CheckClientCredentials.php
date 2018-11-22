@@ -8,8 +8,6 @@
 
 namespace Z1lab\OpenID\Http\Middleware;
 
-use Illuminate\Auth\AuthenticationException;
-use Z1lab\OpenID\Exceptions\MissingScopeException;
 use Z1lab\OpenID\Traits\ValidateTokenTrait;
 
 class CheckClientCredentials
@@ -23,18 +21,14 @@ class CheckClientCredentials
      * @param  \Closure $next
      * @param  mixed ...$scopes
      * @return mixed
-     * @throws \Illuminate\Auth\AuthenticationException
-     * @throws MissingScopeException
      */
     public function handle($request, \Closure $next, ...$scopes)
     {
         $jwt = $request->bearerToken();
-        if ($jwt === NULL)
-            throw new AuthenticationException;
+        if ($jwt === NULL) abort(401);
 
         $token = $this->validateToken($jwt);
-        if ($token === NULL)
-            throw new AuthenticationException;
+        if ($token === NULL) abort(401);
 
         $this->checkScopes($token, $scopes);
 
@@ -44,7 +38,6 @@ class CheckClientCredentials
     /**
      * @param \Lcobucci\JWT\Token $token
      * @param mixed $scopes
-     * @throws MissingScopeException
      */
     private function checkScopes($token, $scopes)
     {
@@ -53,9 +46,7 @@ class CheckClientCredentials
         }
 
         foreach ($scopes as $scope) {
-            if (! in_array($scope, $tokenScopes)) {
-                throw new MissingScopeException($scope);
-            }
+            if (! in_array($scope, $tokenScopes)) abort(403);
         }
     }
 }
