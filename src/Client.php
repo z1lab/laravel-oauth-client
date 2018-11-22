@@ -2,6 +2,7 @@
 
 namespace Z1lab\OpenID;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\URL;
 
 class Client
@@ -39,5 +40,37 @@ class Client
         ]);
 
         return str_finish(config('openid.server'), '/') . "oauth/authorize?$query";
+    }
+
+
+    /**
+     * @param array $scopes
+     * @return string|null
+     */
+    public function getClientToken(array $scopes = [])
+    {
+        if ($client_token = Cache::get('client_token', NULL))
+            return $client_token;
+
+        $client = new \GuzzleHttp\Client(['base_uri' => config('openid.server')]);
+
+        try {
+            $response = $client->post('oauth/token', [
+                'form_params' => [
+                    'grant_type' => 'client_credentials',
+                    'client_id' => config('openid.client.id'),
+                    'client_secret' => config('openid.client.secret'),
+                    'scope' => empty($scopes) ? '' : implode(' ', $scopes),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return NULL;
+        }
+
+        $result = json_decode($response->getBody());
+
+        return Cache::remember('client_token', $result->expires_in / 60, function () use ($result) {
+            return $result->access_token;
+        });
     }
 }

@@ -11,36 +11,36 @@ namespace Z1lab\OpenID\Exceptions;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Arr;
 
-class MissingRoleException extends AuthorizationException
+class MissingScopeException extends AuthorizationException
 {
     /**
      * The roles that the user did not have.
      *
      * @var array
      */
-    protected $roles;
+    protected $scopes;
 
     /**
-     * Create a new missing role exception.
+     * Create a new missing scope exception.
      *
-     * @param  array|string $roles
+     * @param  array|string $scopes
      * @param  string       $message
      * @return void
      */
-    public function __construct($roles = [], $message = 'Invalid role(s) provided.')
+    public function __construct($scopes = [], $message = 'Invalid scope(s) provided.')
     {
         parent::__construct($message);
 
-        $this->roles = Arr::wrap($roles);
+        $this->scopes = Arr::wrap($scopes);
     }
 
     /**
-     * Get the roles that the user did not have.
+     * Get the scopes that the user did not have.
      *
      * @return array
      */
-    public function roles()
+    public function scopes()
     {
-        return $this->roles;
+        return $this->scopes;
     }
 }
