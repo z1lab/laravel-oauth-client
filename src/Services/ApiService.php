@@ -70,7 +70,7 @@ class ApiService
         $client = new Client();
         $bearer = "Bearer {$token}";
         $id = Auth::user()->id;
-        $url = str_finish(env('AUTH_SERVER'), '/') . 'api/' . env('API_VERSION') . "/users/{$id}";
+        $url = str_finish(getenv('AUTH_SERVER'), '/') . 'api/' . getenv('API_VERSION') . "/users/{$id}";
 
         $response = $client->get($url, [
             'headers' => [
