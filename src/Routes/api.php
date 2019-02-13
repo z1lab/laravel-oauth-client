@@ -15,4 +15,4 @@ Route::get('account-recovery', 'LoginController@accountRecovery')->name('account
 
 Route::get('email-confirmation', 'EmailConfirmationController@index')->name('email-confirmation');
 
-Route::post('logout', 'LogoutController@logout')->name('logout');
+Route::match(['GET', 'POST'], 'logout', 'LogoutController@logout')->name('logout');
