@@ -49,7 +49,7 @@ class ApiService
     public function refreshUser(string $token)
     {
         $this->forgetUser();
-        
+
         return $this->getUser($token);
     }
 
@@ -70,7 +70,7 @@ class ApiService
         $client = new Client();
         $bearer = "Bearer {$token}";
         $id = Auth::user()->id;
-        $url = str_finish(getenv('AUTH_SERVER'), '/') . 'api/' . getenv('API_VERSION') . "/users/{$id}";
+        $url = config('openid.server') . '/api/' . config('openid.api_version') . "/users/{$id}";
 
         $response = $client->get($url, [
             'headers' => [
